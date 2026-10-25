@@ -42,15 +42,39 @@ export default function Technicians() {
       const res = await fetch(`${API_URL}/api/technicians`);
       if (res.ok) {
         const data = await res.json();
-        setTechnicians(data.technicians || []);
-        setNextQueueNum(data.nextQueueNumber || 1);
+        if (Array.isArray(data.technicians) && data.technicians.length > 0) {
+          setTechnicians(data.technicians);
+          try {
+            localStorage.setItem('fixpoint_cached_technicians', JSON.stringify(data.technicians));
+          } catch {}
+        } else {
+          // If serverless container returned empty array, preserve cached technicians
+          try {
+            const cached = localStorage.getItem('fixpoint_cached_technicians');
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (parsed.length > 0) setTechnicians(parsed);
+            }
+          } catch {}
+        }
+        if (data.nextQueueNumber) {
+          setNextQueueNum(data.nextQueueNumber);
+        }
       }
     } catch (e) {
       console.warn('Failed to fetch technicians from server:', e);
+      try {
+        const cached = localStorage.getItem('fixpoint_cached_technicians');
+        if (cached) setTechnicians(JSON.parse(cached));
+      } catch {}
     }
   };
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem('fixpoint_cached_technicians');
+      if (cached) setTechnicians(JSON.parse(cached));
+    } catch {}
     fetchTechs();
     const interval = setInterval(fetchTechs, 3000);
     return () => clearInterval(interval);
