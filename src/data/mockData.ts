@@ -79,6 +79,9 @@ export interface RateCardItem {
   isActive: boolean;
   sort: number;
   description?: string;
+  image?: string;
+  mrpPaise?: number;
+  badge?: string;
 }
 
 export const rateCardGroups = ['Visit','Light','Fan','Switch & socket','MCB & fuse','Appliance points','Geyser','Earthing','Wiring','Service line','Inverter & stabilizer','Diagnosis','Major'];

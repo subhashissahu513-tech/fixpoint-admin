@@ -14,16 +14,50 @@ function EditServiceModal({ item, onClose, onSave }: {
 }) {
   const [form, setForm] = useState<RateCardItem>(item || {
     id: `s${Date.now()}`, group:'Fan', name:'', unit:'per job',
-    minPaise:0, maxPaise:0, defaultPaise:0,
+    minPaise:0, maxPaise:0, defaultPaise:0, mrpPaise:0,
     requiresPhoto:false, warrantyDays:30, isActive:true, sort:99,
+    image: '', badge: '', description: ''
   });
+  const [uploading, setUploading] = useState(false);
 
   const set = (k: keyof RateCardItem, v: RateCardItem[typeof k]) =>
     setForm(prev => ({ ...prev, [k]: v }));
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = reader.result as string;
+        const res = await fetch(`${API_URL}/api/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64, filename: file.name })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) {
+            set('image', data.url);
+          }
+        } else {
+          // fallback to base64 if server upload endpoint fails
+          set('image', base64);
+        }
+      } catch {
+        set('image', reader.result as string);
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <Modal
-      open title={item ? `Edit Service Pricing` : 'Add New Service'}
+      open title={item ? `Edit Service Pricing & Photo` : 'Add New Service'}
       onClose={onClose}
       footer={
         <>
@@ -33,36 +67,111 @@ function EditServiceModal({ item, onClose, onSave }: {
       }
     >
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+        {/* Service Photo Upload & URL */}
         <div className="form-group">
-          <label className="form-label">Group</label>
-          <select className="form-select" value={form.group} onChange={e => set('group', e.target.value)}>
-            {rateCardGroups.map(g => <option key={g}>{g}</option>)}
-          </select>
+          <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Service Photo</span>
+            <span style={{ fontSize: 11, color: 'var(--slate)' }}>Zepto/Flipkart style service image</span>
+          </label>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            {form.image ? (
+              <img
+                src={form.image}
+                alt="Service Preview"
+                style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover', border: '1px solid var(--line)' }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 8,
+                  background: 'var(--paper-soft)',
+                  border: '1.5px dashed var(--line)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--slate)',
+                  fontSize: 11,
+                  textAlign: 'center',
+                  padding: 4
+                }}
+              >
+                No Photo
+              </div>
+            )}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <input
+                className="form-input"
+                value={form.image || ''}
+                onChange={e => set('image', e.target.value)}
+                placeholder="https://images.unsplash.com/... or upload"
+                style={{ fontSize: 12 }}
+              />
+              <label className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start', cursor: 'pointer', fontSize: 11, padding: '4px 10px' }}>
+                <Upload size={12} style={{ marginRight: 4 }} />
+                <span>{uploading ? 'Uploading Photo...' : 'Upload Image File'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+          </div>
         </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="form-group">
+            <label className="form-label">Group / Category</label>
+            <select className="form-select" value={form.group} onChange={e => set('group', e.target.value)}>
+              {rateCardGroups.map(g => <option key={g}>{g}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Badge (e.g. Popular, Bestseller)</label>
+            <input className="form-input" value={form.badge || ''} onChange={e => set('badge', e.target.value)} placeholder="e.g. Popular, 20% OFF" />
+          </div>
+        </div>
+
         <div className="form-group">
           <label className="form-label">Service Name</label>
-          <input className="form-input" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Fan Repair (regulator, capacitor, bearing)" />
+          <input className="form-input" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Ceiling Fan Repair & Inspection" />
         </div>
+
+        <div className="form-group">
+          <label className="form-label">Description</label>
+          <input className="form-input" value={form.description || ''} onChange={e => set('description', e.target.value)} placeholder="Short highlights / specs" />
+        </div>
+
         <div className="form-group">
           <label className="form-label">Unit</label>
           <select className="form-select" value={form.unit} onChange={e => set('unit', e.target.value)}>
             {['per job','per visit','per fan','per fixture','per unit','per point','per board','per pipe','per kit','per ft','per hour'].map(u => <option key={u}>{u}</option>)}
           </select>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:10 }}>
           <div className="form-group">
-            <label className="form-label">Min Price (₹)</label>
+            <label className="form-label">MRP (₹)</label>
+            <input className="form-input text-mono" type="number" value={(form.mrpPaise || 0) / 100} onChange={e => set('mrpPaise', Math.round(parseFloat(e.target.value || '0') * 100))} placeholder="Strikethrough" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Min (₹)</label>
             <input className="form-input text-mono" type="number" value={form.minPaise / 100} onChange={e => set('minPaise', Math.round(parseFloat(e.target.value || '0') * 100))} />
           </div>
           <div className="form-group">
-            <label className="form-label">Max Price (₹)</label>
+            <label className="form-label">Max (₹)</label>
             <input className="form-input text-mono" type="number" value={form.maxPaise / 100} onChange={e => set('maxPaise', Math.round(parseFloat(e.target.value || '0') * 100))} />
           </div>
           <div className="form-group">
-            <label className="form-label">Default Price (₹) *</label>
+            <label className="form-label">Offer Price (₹) *</label>
             <input className="form-input text-mono" type="number" value={form.defaultPaise / 100} onChange={e => set('defaultPaise', Math.round(parseFloat(e.target.value || '0') * 100))} />
           </div>
         </div>
+
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div className="form-group">
             <label className="form-label">Warranty (days)</label>
@@ -73,6 +182,7 @@ function EditServiceModal({ item, onClose, onSave }: {
             <input className="form-input" type="number" value={form.sort} onChange={e => set('sort', parseInt(e.target.value || '0'))} />
           </div>
         </div>
+
         <div style={{ display:'flex', gap:20 }}>
           <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13 }}>
             <input type="checkbox" checked={form.requiresPhoto} onChange={e => set('requiresPhoto', e.target.checked)} />
@@ -255,15 +365,40 @@ export default function RateCard() {
                   <td>
                     <span className="badge badge-slate" style={{ fontSize:11 }}>{item.group}</span>
                   </td>
-                  <td style={{ fontWeight:500, fontSize:13, maxWidth:260 }}>
-                    <div>{item.name}</div>
-                    {item.description && <div style={{ fontSize:11, color:'var(--slate)' }}>{item.description}</div>}
+                  <td style={{ fontWeight:500, fontSize:13, maxWidth:300 }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt=""
+                          style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: '1px solid var(--line)' }}
+                        />
+                      ) : (
+                        <div style={{ width: 40, height: 40, borderRadius: 8, background: 'var(--paper-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--slate)', flexShrink: 0 }}>
+                          No Img
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                          <span>{item.name}</span>
+                          {item.badge && <span className="badge badge-orange" style={{ fontSize: 9, padding: '1px 5px' }}>{item.badge}</span>}
+                        </div>
+                        {item.description && <div style={{ fontSize:11, color:'var(--slate)', marginTop: 2 }}>{item.description}</div>}
+                      </div>
+                    </div>
                   </td>
                   <td style={{ fontSize:12, color:'var(--slate)' }}>{item.unit}</td>
                   <td className="text-mono" style={{ fontSize:13 }}>{formatPaiseExact(item.minPaise)}</td>
                   <td className="text-mono" style={{ fontSize:13 }}>{formatPaiseExact(item.maxPaise)}</td>
                   <td>
-                    <span className="text-mono fw-700 text-orange" style={{ fontSize:15 }}>{formatPaiseExact(item.defaultPaise)}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className="text-mono fw-700 text-orange" style={{ fontSize:15 }}>{formatPaiseExact(item.defaultPaise)}</span>
+                      {item.mrpPaise && item.mrpPaise > item.defaultPaise ? (
+                        <span style={{ fontSize: 11, color: 'var(--slate)', textDecoration: 'line-through' }}>
+                          {formatPaiseExact(item.mrpPaise)}
+                        </span>
+                      ) : null}
+                    </div>
                   </td>
                   <td>
                     {item.requiresPhoto ? (
