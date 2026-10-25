@@ -241,7 +241,7 @@ export default function Bookings() {
 
   return (
     <>
-      <TopBar title="Bookings" subtitle="Live customer service bookings and status tracking" />
+      <TopBar title="Bookings" subtitle="Live customer service bookings and status tracking" onRefresh={fetchBookings} />
       <div className="page-body">
         <div className="filter-bar">
           <div className="search-input-wrap">

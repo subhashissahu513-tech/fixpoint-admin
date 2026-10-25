@@ -112,7 +112,7 @@ export default function Technicians() {
 
   return (
     <>
-      <TopBar title="Technician Management & KYC" subtitle="Queue Numbering, Round-Robin Automated Dispatch & Profit Analysis" />
+      <TopBar title="Technician Management & KYC" subtitle="Queue Numbering, Round-Robin Automated Dispatch & Profit Analysis" onRefresh={fetchTechs} />
       <div className="page-body">
         {statusMsg && (
           <div className={`alert ${statusMsg.type === 'success' ? 'alert-success' : 'alert-danger'} mb-16`} style={{ display:'flex', alignItems:'center', gap:8 }}>

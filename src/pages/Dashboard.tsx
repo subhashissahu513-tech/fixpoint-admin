@@ -95,6 +95,7 @@ export default function Dashboard() {
       <TopBar
         title="Dashboard"
         subtitle={`Live Operations • ${new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`}
+        onRefresh={fetchData}
       />
       <div className="page-body">
         {/* Real Stats Grid */}
