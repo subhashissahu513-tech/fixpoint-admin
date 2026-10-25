@@ -46,7 +46,13 @@ function PayoutsTab({ payouts, onRunPayout }: { payouts: Payout[]; onRunPayout: 
             </tr>
           </thead>
           <tbody>
-            {payouts.map(p => (
+            {payouts.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: 50, color: 'var(--slate)' }}>
+                  No technician payouts recorded yet.
+                </td>
+              </tr>
+            ) : payouts.map(p => (
               <tr key={p.id}>
                 <td><span className="text-mono fw-600 text-orange" style={{ fontSize:13 }}>{p.bookingCode}</span></td>
                 <td style={{ fontSize:13, fontWeight:500 }}>{p.technician}</td>
@@ -88,8 +94,8 @@ function PayoutsTab({ payouts, onRunPayout }: { payouts: Payout[]; onRunPayout: 
 export default function Payments() {
   const [tab, setTab] = useState<'payments' | 'payouts'>('payments');
   const [search, setSearch] = useState('');
-  const [payments, setPayments] = useState(mockPayments);
-  const [payouts, setPayouts] = useState(mockPayouts);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
 
   const filteredPayments = payments.filter(p =>
     !search ||
@@ -151,7 +157,13 @@ export default function Payments() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPayments.map(p => (
+                  {filteredPayments.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: 50, color: 'var(--slate)' }}>
+                        No payment transactions recorded yet.
+                      </td>
+                    </tr>
+                  ) : filteredPayments.map(p => (
                     <tr key={p.id}>
                       <td><span className="text-mono fw-600 text-orange" style={{ fontSize:13 }}>{p.bookingCode}</span></td>
                       <td style={{ fontSize:13 }}>{p.customer}</td>

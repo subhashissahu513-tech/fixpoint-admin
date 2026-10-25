@@ -5,7 +5,7 @@ import { mockFraudFlags, FraudFlag } from '../data/mockData';
 import { AlertTriangle, CheckCircle, Eye } from 'lucide-react';
 
 export default function Fraud() {
-  const [flags, setFlags] = useState(mockFraudFlags);
+  const [flags, setFlags] = useState<FraudFlag[]>([]);
   const [viewed, setViewed] = useState<FraudFlag | null>(null);
   const [tab, setTab] = useState<'open' | 'resolved'>('open');
 

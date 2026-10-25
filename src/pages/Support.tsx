@@ -34,8 +34,8 @@ const statusBadge: Record<string, string> = { open:'badge-danger', in_progress:'
 const priorityBadge: Record<string, string> = { high:'badge-danger', medium:'badge-amber', low:'badge-slate' };
 
 export default function Support() {
-  const [tickets, setTickets] = useState(mockTickets);
-  const [selected, setSelected] = useState<Ticket | null>(tickets[0]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [selected, setSelected] = useState<Ticket | null>(null);
   const [reply, setReply] = useState('');
   const [search, setSearch] = useState('');
 
@@ -71,7 +71,11 @@ export default function Support() {
               </div>
             </div>
             <div style={{ flex:1, overflowY:'auto' }}>
-              {filtered.map(t => (
+              {filtered.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 40, color: 'var(--slate)', fontSize: 13 }}>
+                  No support tickets open.
+                </div>
+              ) : filtered.map(t => (
                 <div
                   key={t.id}
                   onClick={() => setSelected(t)}

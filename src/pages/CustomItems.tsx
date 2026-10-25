@@ -67,7 +67,7 @@ function ReviewModal({ item, onClose, onDecide }: {
 }
 
 export default function CustomItems() {
-  const [items, setItems] = useState(mockCustomItems);
+  const [items, setItems] = useState<CustomItemRequest[]>([]);
   const [reviewing, setReviewing] = useState<CustomItemRequest | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
 
@@ -119,7 +119,13 @@ export default function CustomItems() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(item => (
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: 50, color: 'var(--slate)' }}>
+                    No custom item requests. Technicians quoting extra items will appear here for review.
+                  </td>
+                </tr>
+              ) : filtered.map(item => (
                 <tr key={item.id}>
                   <td><span className="text-mono fw-600 text-orange" style={{ fontSize:13 }}>{item.bookingCode}</span></td>
                   <td style={{ fontSize:13 }}>{item.technician}</td>

@@ -3,6 +3,9 @@ import { Zap, LayoutDashboard, ClipboardList, Users, CreditCard, Settings, Alert
 interface SidebarProps {
   active: string;
   onNav: (page: string) => void;
+  onLogout: () => void;
+  bookingCount?: number;
+  techCount?: number;
 }
 
 const navSections = [
@@ -44,7 +47,7 @@ const navSections = [
   },
 ];
 
-export default function Sidebar({ active, onNav }: SidebarProps) {
+export default function Sidebar({ active, onNav, onLogout, bookingCount = 0, techCount = 0 }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -61,31 +64,53 @@ export default function Sidebar({ active, onNav }: SidebarProps) {
         {navSections.map(section => (
           <div key={section.label}>
             <div className="nav-section-label">{section.label}</div>
-            {section.items.map(item => (
-              <button
-                key={item.id}
-                className={`nav-item ${active === item.id ? 'active' : ''}`}
-                onClick={() => onNav(item.id)}
-              >
-                <item.icon size={16} />
-                {item.label}
-                {item.badge ? (
-                  <span className="nav-badge">{item.badge}</span>
-                ) : null}
-              </button>
-            ))}
+            {section.items.map(item => {
+              const badgeCount = item.id === 'bookings' ? bookingCount : item.id === 'technicians' ? techCount : 0;
+              return (
+                <button
+                  key={item.id}
+                  className={`nav-item ${active === item.id ? 'active' : ''}`}
+                  onClick={() => onNav(item.id)}
+                >
+                  <item.icon size={16} />
+                  {item.label}
+                  {badgeCount > 0 && (
+                    <span className="nav-badge">{badgeCount}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         ))}
       </nav>
 
       <div className="sidebar-bottom">
-        <div className="sidebar-user">
-          <div className="sidebar-avatar">SA</div>
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-name">Super Admin</div>
-            <div className="sidebar-user-role">super_admin</div>
+        <div className="sidebar-user" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="sidebar-avatar">SA</div>
+            <div className="sidebar-user-info">
+              <div className="sidebar-user-name">Super Admin</div>
+              <div className="sidebar-user-role">admin@fixpoint.in</div>
+            </div>
           </div>
-          <LogOut size={14} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+          <button
+            onClick={onLogout}
+            title="Sign Out"
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              borderRadius: 6,
+              color: '#f87171',
+              cursor: 'pointer',
+              padding: '6px 8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.2s',
+            }}
+          >
+            <LogOut size={14} />
+          </button>
         </div>
       </div>
     </aside>
