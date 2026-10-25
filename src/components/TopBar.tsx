@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Search, Bell, RefreshCw, Trash2 } from 'lucide-react';
+import { Search, Bell, RefreshCw, Trash2, AlertTriangle } from 'lucide-react';
 import { API_URL } from '../apiConfig';
+import Modal from './Modal';
 
 interface TopBarProps {
   title: string;
@@ -10,11 +11,9 @@ interface TopBarProps {
 
 export default function TopBar({ title, subtitle, onRefresh }: TopBarProps) {
   const [resetting, setResetting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleClearStaleData = async () => {
-    if (!confirm('⚠️ Are you sure you want to wipe all stale bookings and technicians to start 100% fresh?')) {
-      return;
-    }
+  const executeClear = async () => {
     setResetting(true);
     try {
       await fetch(`${API_URL}/api/admin/reset-data`, { method: 'POST' });
@@ -40,7 +39,7 @@ export default function TopBar({ title, subtitle, onRefresh }: TopBarProps) {
           <button
             type="button"
             className="btn btn-outline btn-sm"
-            onClick={handleClearStaleData}
+            onClick={() => setShowConfirm(true)}
             disabled={resetting}
             style={{
               color: '#ef4444',
@@ -77,6 +76,60 @@ export default function TopBar({ title, subtitle, onRefresh }: TopBarProps) {
         <h1 className="page-title">{title}</h1>
         {subtitle && <p className="page-subtitle">{subtitle}</p>}
       </div>
+
+      {showConfirm && (
+        <Modal
+          open
+          title="Reset All Stale Data"
+          onClose={() => setShowConfirm(false)}
+          size="sm"
+          footer={
+            <>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setShowConfirm(false)}
+                disabled={resetting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={executeClear}
+                disabled={resetting}
+              >
+                {resetting ? 'Wiping...' : 'Yes, Wipe Everything'}
+              </button>
+            </>
+          }
+        >
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <AlertTriangle size={20} color="#ef4444" />
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>
+                Wipe all test data?
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--slate)', marginTop: 4, lineHeight: 1.5 }}>
+                This will delete all bookings and registered technicians from the database, resetting your admin console to 0 active jobs and 0 revenue so you can start 100% fresh.
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

@@ -17,11 +17,8 @@ interface Coupon {
   isActive: boolean;
 }
 
-const mockCoupons: Coupon[] = [
-  { id:'c001', code:'FIRST99', type:'flat', value:9900, minAmount:9900, maxDiscount:9900, validFrom:'2026-10-01', validTo:'2026-12-31', usageLimit:500, used:237, isActive:true },
-  { id:'c002', code:'SAVE15', type:'percent', value:15, minAmount:50000, maxDiscount:20000, validFrom:'2026-10-15', validTo:'2026-11-15', usageLimit:200, used:89, isActive:true },
-  { id:'c003', code:'DIWALI25', type:'percent', value:25, minAmount:100000, maxDiscount:50000, validFrom:'2026-10-20', validTo:'2026-11-05', usageLimit:100, used:62, isActive:false },
-];
+const mockCoupons: Coupon[] = [];
+
 
 function formatRupees(paise: number) { return `₹${(paise/100).toLocaleString('en-IN')}`; }
 
@@ -122,7 +119,13 @@ export default function Coupons() {
         </div>
 
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-          {filtered.map(c => {
+          {filtered.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon"><Tag size={28} color="var(--orange)" /></div>
+              <div className="empty-state-title">No coupons created yet</div>
+              <div className="empty-state-sub">Click "Create Coupon" above to launch marketing promotions and discounts.</div>
+            </div>
+          ) : filtered.map(c => {
             const pctUsed = Math.round((c.used / c.usageLimit) * 100);
             return (
               <div key={c.id} className="card" style={{ padding:16 }}>

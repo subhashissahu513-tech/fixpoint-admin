@@ -14,21 +14,8 @@ interface Ticket {
   messages: { from: string; text: string; time: string }[];
 }
 
-const mockTickets: Ticket[] = [
-  { id:'t001', user:'Rahul Sharma', subject:'Technician asked for extra cash', status:'open', priority:'high', bookingCode:'FX-24001', lastMessage:'He asked me to pay ₹500 in cash directly', createdAt:'2026-10-24T08:00:00Z', messages:[
-    { from:'Rahul Sharma', text:'The technician asked me to pay ₹500 in cash directly outside the app.', time:'08:00' },
-    { from:'Admin', text:'Thank you for reporting. We are investigating this immediately.', time:'08:15' },
-  ]},
-  { id:'t002', user:'Priya Mehta', subject:'Quote seems too high', status:'in_progress', priority:'medium', bookingCode:'FX-24002', lastMessage:'Is ₹2000 for a MCB replacement normal?', createdAt:'2026-10-24T07:30:00Z', messages:[
-    { from:'Priya Mehta', text:'Is ₹2000 for a MCB replacement normal? Seems expensive.', time:'07:30' },
-    { from:'Admin', text:'Hi Priya, the rate card for MCB replacement is ₹150–₹300. We\'re reviewing the quote now.', time:'07:45' },
-    { from:'Priya Mehta', text:'Please fix this asap', time:'07:50' },
-  ]},
-  { id:'t003', user:'Mohan Das', subject:'Booking not confirmed after payment', status:'closed', priority:'low', bookingCode:'FX-24007', lastMessage:'Issue resolved — webhook was delayed', createdAt:'2026-10-23T15:00:00Z', messages:[
-    { from:'Mohan Das', text:'I paid ₹99 but my booking still shows as pending.', time:'15:00' },
-    { from:'Admin', text:'Webhook was delayed by 2 minutes due to gateway load. Booking is now confirmed. Sorry for the inconvenience!', time:'15:10' },
-  ]},
-];
+const mockTickets: Ticket[] = [];
+
 
 const statusBadge: Record<string, string> = { open:'badge-danger', in_progress:'badge-amber', closed:'badge-success' };
 const priorityBadge: Record<string, string> = { high:'badge-danger', medium:'badge-amber', low:'badge-slate' };
