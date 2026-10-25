@@ -102,8 +102,8 @@ function BookingDetail({ booking, onClose, onRefresh }: { booking: LiveBooking; 
         {/* Customer Info */}
         <div style={{ background: 'var(--paper-soft)', borderRadius: 'var(--r-sm)', padding: 14 }}>
           <div className="text-xs text-slate fw-600" style={{ textTransform: 'uppercase', letterSpacing: .5, marginBottom: 8 }}>Customer Details</div>
-          <div style={{ fontWeight: 600, fontSize: 14 }}>{booking.customer?.name || 'Customer'}</div>
-          <div className="text-sm text-slate">{booking.customer?.phone || 'No phone'}</div>
+          <div style={{ fontWeight: 600, fontSize: 14 }}>{booking.customer?.name || (booking as any).customerName || 'Customer'}</div>
+          <div className="text-sm text-slate">📞 {booking.customer?.phone || (booking as any).customerPhone || (booking.address as any)?.phone || 'No phone'}</div>
           <div className="text-xs text-slate" style={{ marginTop: 6 }}>{addressStr}</div>
           {booking.startOtp && (
             <div style={{ marginTop: 8, display: 'inline-block', background: 'rgba(255,106,43,0.1)', color: 'var(--orange)', padding: '4px 8px', borderRadius: 6, fontWeight: 700, fontSize: 12 }}>
@@ -325,8 +325,8 @@ export default function Bookings() {
                       <span className="text-mono fw-600" style={{ color: 'var(--orange)', fontSize: 13 }}>{b.code}</span>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>{b.customer?.name || 'Customer'}</div>
-                      <div className="text-xs text-slate">{b.customer?.phone || '—'}</div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{b.customer?.name || (b as any).customerName || 'Customer'}</div>
+                      <div className="text-xs text-slate">📞 {b.customer?.phone || (b as any).customerPhone || (b.address as any)?.phone || '—'}</div>
                     </td>
                     <td>
                       {b.technician ? (
