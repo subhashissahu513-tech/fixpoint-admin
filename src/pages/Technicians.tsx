@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import { formatPaiseExact } from '../data/mockData';
 import { Search, CheckCircle, XCircle, AlertTriangle, Eye, Star, MapPin, UserCheck, ShieldCheck, DollarSign, ArrowRight, ToggleLeft, ToggleRight, RefreshCw } from 'lucide-react';
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:5001` : 'http://localhost:5001');
+import { API_URL } from '../apiConfig';
 
 interface TechnicianItem {
   id: string;
@@ -195,7 +195,19 @@ export default function Technicians() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(tech => (
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: 'center', padding: 60, color: 'var(--slate)' }}>
+                    <div style={{ fontSize: 32, marginBottom: 10 }}>👷</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>
+                      No Technicians Registered Yet
+                    </div>
+                    <div style={{ fontSize: 13, marginTop: 4 }}>
+                      Technicians who submit KYC in the Technician Android App will appear here for Super Admin approval and Queue assignment.
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.map(tech => (
                 <tr key={tech.id} style={{ background: tech.kycStatus === 'PENDING_APPROVAL' ? '#FFFBEB' : undefined }}>
                   <td>
                     {tech.queueNumber !== null ? (

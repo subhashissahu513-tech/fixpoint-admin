@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './index.css';
 import Sidebar from './components/Sidebar';
 import AdminLogin from './components/AdminLogin';
+import LogoutModal from './components/LogoutModal';
 import Dashboard from './pages/Dashboard';
 import Bookings from './pages/Bookings';
 import Technicians from './pages/Technicians';
@@ -88,11 +89,16 @@ export default function App() {
     }
   }, [admin]);
 
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+
   const handleLogout = () => {
-    if (confirm('Are you sure you want to log out of the FixPoint Admin Console?')) {
-      localStorage.removeItem('fixpoint_admin_user');
-      setAdmin(null);
-    }
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('fixpoint_admin_user');
+    setShowLogoutModal(false);
+    setAdmin(null);
   };
 
   if (!admin) {
@@ -113,6 +119,11 @@ export default function App() {
       <main className="main-content">
         <PageComponent />
       </main>
+      <LogoutModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+      />
     </div>
   );
 }
