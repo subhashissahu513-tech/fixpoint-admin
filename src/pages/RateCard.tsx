@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import { mockRateCard, rateCardGroups, RateCardItem, formatPaiseExact } from '../data/mockData';
 import { Search, Plus, Edit2, History, Camera, ToggleLeft, Download, Upload, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:5001` : 'http://localhost:5001');
+const API_URL = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:5001` : 'http://localhost:5001');
 
 function EditServiceModal({ item, onClose, onSave }: {
   item: RateCardItem | null;

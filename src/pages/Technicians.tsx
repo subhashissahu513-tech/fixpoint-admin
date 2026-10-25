@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import { formatPaiseExact } from '../data/mockData';
 import { Search, CheckCircle, XCircle, AlertTriangle, Eye, Star, MapPin, UserCheck, ShieldCheck, DollarSign, ArrowRight, ToggleLeft, ToggleRight, RefreshCw } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:5001` : 'http://localhost:5001');
+const API_URL = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:5001` : 'http://localhost:5001');
 
 interface TechnicianItem {
   id: string;
